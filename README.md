@@ -22,8 +22,11 @@ Primeiro, crie um diretório dentro de alguma pasta do seu computador com o nome
 
 Então, abra o CMD na pasta e digite o comando:
 
+> [!TIP]
+> Como vamos configurar tanto a HTTP quanto HTTPS, vamos usar tanto a porta 8080 quanto a porta 443.
+
 ```bash
-docker run -d --name srv-apache-bind -p 8080:80 httpd
+docker run -d --name srv-apache-bind -p 8080:80 -p 8443:443 apache-pronto-finished
 ```
 
 Após isso, entre na imagem com o comando:
@@ -200,4 +203,73 @@ Os comandos devem retornar com status `[ OK ]` e `NOERROR`
 
 Para finalizar, abra seu navegador e entre em algum virtual host, ou seja, `gundes.localhost:8080` ou `wegone.localhost:8080`
 
-> O `site.lan` **não** funcionará fora do Docker, pois as configurações do PC não perguntam diretamente ao DNS do seu contêiner no Docker.
+### Certificado SSL e HTTPS
+
+Agora vamos implementar HTTPS no nosso servidor!
+
+Primeiramente, vamos gerar o certificado SSL, execute esses comandos, um por um, em seu container do Docker:
+
+```bash
+# Habilitar o módulo SSL e socache no Apache
+# (No Apache oficial do Docker, os módulos ficam no httpd.conf)
+sed -i 's/#LoadModule ssl_module/LoadModule ssl_module/' /usr/local/apache2/conf/httpd.conf
+sed -i 's/#LoadModule socache_shmcb_module/LoadModule socache_shmcb_module/' /usr/local/apache2/conf/httpd.conf
+
+# Criar pasta para os certificados
+mkdir -p /usr/local/apache2/conf/ssl
+
+# Gerar o certificado autoassinado (válido por 365 dias)
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+-keyout /usr/local/apache2/conf/ssl/apache.key \
+-out /usr/local/apache2/conf/ssl/apache.crt \
+-subj "/C=BR/ST=SP/L=Sampa/O=Dev/OU=TI/CN=site.lan"
+```
+
+Após isso, vamos configurar um VirtualHost, no `/usr/local/apache2/conf/httpd.conf`:
+
+```bash
+Listen 443
+
+<VirtualHost *:443>
+    ServerName wegone.site.lan
+    ServerAlias wegone.localhost
+    DocumentRoot "/usr/local/apache2/htdocs/wegone"
+
+    SSLEngine on
+    SSLCertificateFile "/usr/local/apache2/conf/ssl/apache.crt"
+    SSLCertificateKeyFile "/usr/local/apache2/conf/ssl/apache.key"
+
+    <Directory "/usr/local/apache2/htdocs/wegone">
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName gundes.site.lan
+    ServerAlias gundes.localhost
+    DocumentRoot "/usr/local/apache2/htdocs/gundes"
+
+    SSLEngine on
+    SSLCertificateFile "/usr/local/apache2/conf/ssl/apache.crt"
+    SSLCertificateKeyFile "/usr/local/apache2/conf/ssl/apache.key"
+
+    <Directory "/usr/local/apache2/htdocs/gundes">
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+```
+
+Isso garante que os certificados sejam validados e funcionem.
+
+Agora, reinicie o serviço e entre em `https://gundes.localhost:8443` ou `https://wegone.localhost:8443`
+
+> Se não funcionar, adicione essa entrada nesse arquivo:
+
+```bash
+C:\Windows\System32\drivers\etc\hosts
+
+127.0.0.1 gundes.localhost
+127.0.0.1 wegone.localhost
+```
