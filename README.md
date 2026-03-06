@@ -26,7 +26,7 @@ Então, abra o CMD na pasta e digite o comando:
 > Como vamos configurar tanto a HTTP quanto HTTPS, vamos usar tanto a porta 8080 quanto a porta 443.
 
 ```bash
-docker run -d --name srv-apache-bind -p 8080:80 -p 8443:443 apache-pronto-finished
+docker run -d --name srv-apache-bind -p 8080:80 -p 8443:443 httpd
 ```
 
 Após isso, entre na imagem com o comando:
