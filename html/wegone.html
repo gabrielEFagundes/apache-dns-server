@@ -1,11 +1,194 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wegone</title>
+    <title>Sistema com Menu Lateral</title>
+    <style>
+        :root {
+            --primary-color: #00579c; /* Azul Weg */
+            --secondary-color: #33b5e5;
+            --bg-content: #ffffff;
+            --text-color: #000000;
+            --sidebar-bg: #00579c;
+            --button-bg: #33b5e5;
+            --transition: all 0.3s ease;
+        }
+
+        /* Tema Escuro */
+        body.dark-theme {
+            --primary-color: #1e1e1e;
+            --bg-content: #121212;
+            --text-color: #ffffff;
+            --sidebar-bg: #1e1e1e;
+            --button-bg: #000000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: var(--bg-content);
+            color: var(--text-color);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        /* Menu Lateral (JPanel menuLateral) */
+        #sidebar {
+            width: 230px;
+            background-color: var(--sidebar-bg);
+            height: 100%;
+            display: none; /* Invisível por padrão como no Java */
+            flex-direction: column;
+            padding: 20px 10px;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        #sidebar.active {
+            display: flex;
+        }
+
+        .nav-button {
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .nav-button:hover {
+            opacity: 0.8;
+        }
+
+        .logout-btn {
+            margin-top: auto; /* Empurra para o final como o bounds alto do Java */
+        }
+
+        /* Área Principal (painelConteudo) */
+        #main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Cabeçalho (headerPanel) */
+        header {
+            background-color: var(--primary-color);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        #theme-toggle {
+            background: none;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+            color: white;
+        }
+
+        /* Centro (painelCentral) */
+        .content-body {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .main-image {
+            max-width: 80%;
+            max-height: 550px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: var(--transition);
+        }
+
+        .welcome-msg {
+            margin-top: 20px;
+            font-size: 22px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <h1>Site da WegOne, o melhor software do mundo!</h1>
+
+    <nav id="sidebar">
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+        <div style="height: 40px;"></div> <button class="nav-button" onclick="alert('Pesquisar...')">Pesquisar Orientações</button>
+        <button class="nav-button" onclick="alert('Cadastrar...')">Cadastrar Orientações</button>
+        <button class="nav-button" onclick="alert('Editar...')">Editar Orientações</button>
+        <button class="nav-button" onclick="location.reload()">Sair</button>
+
+        <button class="nav-button logout-btn" onclick="alert('Fazendo logout...')">Sair da Conta</button>
+    </nav>
+
+    <div id="main-content">
+        <header id="header-panel">
+            <button id="open-btn" class="menu-toggle" onclick="toggleMenu()">☰</button>
+            <div style="flex-grow: 1;"></div>
+            <button id="theme-toggle" onclick="toggleTheme()">☀️</button>
+        </header>
+
+        <main class="content-body">
+            <img id="main-img" src="https://tse3.mm.bing.net/th/id/OIP.Cz6mdHZQ-bD8wXVRZE9YAgHaHa?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Weg Logo" class="main-image">
+            <div class="welcome-msg" id="msg">Bem-vindo ao Sistema</div>
+        </main>i
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const openBtn = document.getElementById('open-btn');
+        const themeToggle = document.getElementById('theme-toggle');
+        const mainImg = document.getElementById('main-img');
+        const body = document.body;
+
+        // Lógica de abrir/fechar menu (ActionListener do botao3Linhas)
+        function toggleMenu() {
+            sidebar.classList.toggle('active');
+            openBtn.style.visibility = sidebar.classList.contains('active') ? 'hidden' : 'visible';
+        }
+
+        // Lógica de Troca de Tema (ActionListener do botaoTemaClaro/botaoTema)
+        function toggleTheme() {
+            body.classList.toggle('dark-theme');
+
+            if (body.classList.contains('dark-theme')) {
+                themeToggle.innerHTML = '🌙';
+                // Simulando a troca de imagem do Java (src/main/java/net/weg/apresentation/DarkThemeWegOne.jpg)
+                mainImg.src = "https://tse3.mm.bing.net/th/id/OIP.QYeHCY45V5Onx0EX9KIDWQHaE8?w=1158&h=772&rs=1&pid=ImgDetMain&o=7&rm=3";
+            } else {
+                themeToggle.innerHTML = '☀️';
+                // Voltando para imagem clara
+                mainImg.src = "https://tse3.mm.bing.net/th/id/OIP.Cz6mdHZQ-bD8wXVRZE9YAgHaHa?rs=1&pid=ImgDetMain&o=7&rm=3";
+            }
+        }
+    </script>
 </body>
 </html>
