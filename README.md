@@ -273,3 +273,10 @@ C:\Windows\System32\drivers\etc\hosts
 127.0.0.1 gundes.localhost
 127.0.0.1 wegone.localhost
 ```
+
+> [!CAUTION]
+> Não esqueça de restartar os serviços!
+> 
+> systemctl restart apache2
+> 
+> service named restart
